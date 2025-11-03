@@ -30,6 +30,14 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
     try:
         hass.data.setdefault(DOMAIN, {})  # Initialize domain data storage safely
+        
+        # Register the frontend resources for the custom card
+        hass.http.register_static_path(
+            "/mbtalive-card-bundle.js",
+            hass.config.path("custom_components/mbtalive/frontend/mbtalive-card-bundle.js"),
+            True,
+        )
+        
         _LOGGER.debug("%s data initialized: %s", DOMAIN, hass.data[DOMAIN])
         return True
     except Exception as e:
