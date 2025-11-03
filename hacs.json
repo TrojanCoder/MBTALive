@@ -1,5 +1,7 @@
 {
     "name": "MBTA Live",
-    "country": ["us"]
-  }
+    "country": ["us"],
+    "content_in_root": false,
+    "render_readme": true
+}
   

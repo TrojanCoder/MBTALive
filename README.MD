@@ -4,14 +4,15 @@ MBTALive is an independent project and is not affiliated with or endorsed by the
 
 ## Overview  
 
-MBTALive is a Home Assistant integration that provides real-time MBTA transit data, helping you monitor your commute and stay updated with transit information directly in Home Assistant.  
+MBTALive is a Home Assistant integration that provides real-time MBTA transit data, helping you monitor your commute and stay updated with transit information directly in Home Assistant. The integration includes both a **custom component** for data collection and a **custom Lovelace card** for beautiful dashboard display.
 
 ### Key Features:  
 - **Trip and Train Tracking**: Monitor trips (departure → arrival stops) and Commuter Rail trains (train number-based tracking).  
 - **Multi-Mode Support**: Works with trains, subways, buses, and ferries.  
 - **Live Transit Data**: Get arrival/departure times, delays, alerts, platforms, and more.  
 - **Autodiscovery**: Automatically finds the fastest direct trip between provided stops.  
-- **Custom Tracking**: Choose how many subsequent trips and trains to track.  
+- **Custom Tracking**: Choose how many subsequent trips and trains to track.
+- **Custom Lovelace Card**: Beautiful, responsive dashboard card with real-time updates and visual editor.  
 
 ## Features  
 
@@ -40,7 +41,19 @@ Buses (No platform)
 ![bus](images/bus.png)  
 
 Ferries (No live update, no geolocation)  
-![ferry](images/ferry.png)  
+![ferry](images/ferry.png)
+
+#### Custom Lovelace Card
+The MBTALive Card provides a beautiful, responsive interface for displaying your transit data:
+
+![MBTALive Card](custom_cards/mbtalive-card/images/image.png)
+
+**Card Features:**
+- Clean, modern interface with route-specific colors
+- Real-time updates with arrival times and delays
+- Support for all MBTA transit modes (subway, bus, commuter rail, ferry)
+- Visual configuration editor in the Lovelace UI
+- Responsive design that works on mobile and desktop  
 
 ## Installation  
 
@@ -70,6 +83,32 @@ Follow the [HACS installation guide](https://hacs.xyz/).
    - **Train Number**: Enter a valid Commuter Rail train number. Train numbers are listed in the [Commuter Rail Schedules](https://www.mbta.com/schedules/commuter-rail).  
      - **Note 1**: Setting a train number will switch the trip to train-based tracking (tracked until arrival).  
      - **Note 2**: A trip for the specified train number must be scheduled within the next 7 days; otherwise, the sensor creation will fail.
+
+### 5. Add the Custom Card (Optional)
+The MBTALive integration includes a beautiful custom Lovelace card for displaying your transit data:
+
+#### Automatic Installation (via HACS)
+The custom card is automatically included when you install the MBTALive integration through HACS.
+
+#### Manual Installation  
+1. Download `mbtalive-card-bundle.js` from the `custom_cards/mbtalive-card/` directory
+2. Copy it to your `www/` directory in your Home Assistant configuration
+3. Add the resource in Home Assistant:
+   - Go to **Settings → Dashboards → Resources**
+   - Click **+ Add Resource**
+   - URL: `/local/mbtalive-card-bundle.js`
+   - Resource Type: **JavaScript Module**
+
+#### Using the Card
+1. Edit your dashboard and add a new card
+2. Search for **MBTALive Card** in the card picker
+3. Configure the card using the visual editor:
+   - **Title**: Display name for the card
+   - **Entity**: Select an MBTALive sensor entity
+   - **Show Header**: Toggle card header display
+   - **Compact Mode**: Use condensed layout for smaller spaces
+
+For detailed card configuration options, see the [Custom Card Documentation](custom_cards/mbtalive-card/README.md).
 ## Updating  
 
 HACS will notify you when an update is available. To update:  

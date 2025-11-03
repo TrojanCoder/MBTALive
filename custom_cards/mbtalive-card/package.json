@@ -1,0 +1,32 @@
+{
+  "name": "mbtalive-card",
+  "version": "2.0.0",
+  "description": "A modern Lovelace custom card for displaying MBTA train information",
+  "main": "mbtalive-card-bundle.js",
+  "author": "MBTALive Project",
+  "license": "MIT",
+  "homepage": "https://github.com/chiabre/MBTALive",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chiabre/MBTALive.git"
+  },
+  "keywords": [
+    "homeassistant",
+    "lovelace",
+    "card",
+    "mbta",
+    "transit",
+    "transportation",
+    "trains",
+    "subway"
+  ],
+  "files": [
+    "mbtalive-card-bundle.js",
+    "src/",
+    "README.md"
+  ],
+  "hacs": {
+    "filename": "mbtalive-card-bundle.js",
+    "type": "plugin"
+  }
+}
