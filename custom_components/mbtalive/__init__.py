@@ -17,6 +17,8 @@ Logging:
 """
 
 import logging
+import os
+from pathlib import Path
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -32,11 +34,32 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         hass.data.setdefault(DOMAIN, {})  # Initialize domain data storage safely
         
         # Register the frontend resources for the custom card
-        hass.http.register_static_path(
-            "/mbtalive-card-bundle.js",
-            hass.config.path("custom_components/mbtalive/frontend/mbtalive-card-bundle.js"),
-            True,
-        )
+        integration_dir = Path(__file__).parent
+        frontend_path = integration_dir / "frontend" / "mbtalive-card-bundle.js"
+        
+        if frontend_path.exists():
+            # Register the static path using the correct modern API
+            url_path = f"/{DOMAIN}/mbtalive-card-bundle.js"
+            hass.http.register_static_path(url_path, str(frontend_path), cache_headers=False)
+            _LOGGER.info("Registered MBTALive card at %s", url_path)
+            
+            # Also register as a Lovelace resource
+            try:
+                hass.data.setdefault("lovelace", {})
+                hass.data["lovelace"].setdefault("resources", [])
+                
+                resource = {
+                    "url": url_path,
+                    "type": "module"
+                }
+                
+                if resource not in hass.data["lovelace"]["resources"]:
+                    hass.data["lovelace"]["resources"].append(resource)
+                    _LOGGER.info("Added MBTALive card as Lovelace resource")
+            except Exception as e:
+                _LOGGER.warning("Could not auto-register Lovelace resource: %s", e)
+        else:
+            _LOGGER.warning("MBTALive card bundle not found at %s", frontend_path)
         
         _LOGGER.debug("%s data initialized: %s", DOMAIN, hass.data[DOMAIN])
         return True
