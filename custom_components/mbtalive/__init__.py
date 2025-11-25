@@ -23,6 +23,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .const import DOMAIN
+from . import utils
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,35 +34,26 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     try:
         hass.data.setdefault(DOMAIN, {})  # Initialize domain data storage safely
         
-        # Register the frontend resources for the custom card using modern approach
-        try:
-            # Use the frontend component to register the card
-            from homeassistant.components.frontend import add_extra_js_url
+        # Register the frontend resources for the custom card
+        integration_dir = Path(__file__).parent
+        card_path = integration_dir / "frontend" / "mbtalive-card-bundle.js"
+        
+        if card_path.exists():
+            # 1. Register the static path to serve the card
+            utils.register_static_path(
+                hass.http.app,
+                "/mbtalive/frontend/mbtalive-card-bundle.js",
+                card_path,
+            )
             
-            integration_dir = Path(__file__).parent
-            frontend_path = integration_dir / "frontend" / "mbtalive-card-bundle.js"
-            
-            if frontend_path.exists():
-                # Copy the card to www directory so it can be served
-                www_dir = Path(hass.config.config_dir) / "www"
-                www_dir.mkdir(exist_ok=True)
-                
-                www_card_path = www_dir / "mbtalive-card-bundle.js"
-                
-                # Copy the file to www directory
-                import shutil
-                shutil.copy2(frontend_path, www_card_path)
-                
-                # Add it as a frontend resource
-                add_extra_js_url(hass, "/local/mbtalive-card-bundle.js")
-                _LOGGER.info("Registered MBTALive card as frontend resource")
-            else:
-                _LOGGER.warning("MBTALive card bundle not found at %s", frontend_path)
-                
-        except ImportError:
-            _LOGGER.warning("Could not import frontend component - card registration skipped")
-        except Exception as e:
-            _LOGGER.warning("Could not register frontend resource: %s", e)
+            # 2. Add card to lovelace resources
+            version = getattr(hass.data["integrations"].get(DOMAIN), "version", "0")
+            await utils.init_resource(
+                hass, "/mbtalive/frontend/mbtalive-card-bundle.js", str(version)
+            )
+            _LOGGER.info("Registered MBTALive custom card")
+        else:
+            _LOGGER.warning("MBTALive card bundle not found at %s", card_path)
         
         _LOGGER.debug("%s data initialized: %s", DOMAIN, hass.data[DOMAIN])
         return True
